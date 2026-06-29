@@ -1,6 +1,7 @@
 import serial
 import speech_recognition as sr
 import numpy as np
+import time
 
 # ==========================================
 # SERIAL COMMAND KEYS SENT TO THE ARDUINO
@@ -36,6 +37,11 @@ NOISE_THRESHOLD = 500
 # -------------------------------
 
 arduino = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+
+# IMPORTANT FIX: Arduino reset delay
+time.sleep(2)
+arduino.reset_input_buffer()
+
 print(f"[INFO] Connected to Arduino on {SERIAL_PORT}")
 
 recognizer = sr.Recognizer()
@@ -59,7 +65,8 @@ def get_rms_volume(audio_data):
 
 
 def send_signal(command):
-    arduino.write(command.encode())
+    arduino.write((command + "\n").encode())
+    arduino.flush()
     print(f"[SENT] {command}")
 
 
@@ -112,7 +119,7 @@ try:
     while True:
 
         with microphone as source:
-            audio = recognizer.listen(source, phrase_time_limit=3)
+            audio = recognizer.listen(source, timeout=5, phrase_time_limit=3)
 
         volume = get_rms_volume(audio)
 
