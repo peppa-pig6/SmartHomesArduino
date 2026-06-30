@@ -4,24 +4,18 @@ Servo doorServo;
 
 // Pins
 const int lightPin = 8;
-const int fanPin = 9;
-const int securityPin = 10;
 const int servoPin = 6;
 
 /*
 SERIAL COMMANDS FROM PYTHON
 A = Light ON      a = Light OFF
-B = Fan ON        b = Fan OFF
-C = Door OPEN     c = Door CLOSED
-D = Security ON   d = Security OFF
+B = Door OPEN     b = Door CLOSED
 */
 
 void setup() {
   Serial.begin(9600);
 
   pinMode(lightPin, OUTPUT);
-  pinMode(fanPin, OUTPUT);
-  pinMode(securityPin, OUTPUT);
 
   doorServo.attach(servoPin);
   doorServo.write(0);
@@ -52,37 +46,17 @@ void loop() {
         break;
 
       case 'B':
-        digitalWrite(fanPin, HIGH);
-        Serial.println("FAN ON");
-        break;
-
-      case 'b':
-        digitalWrite(fanPin, LOW);
-        Serial.println("FAN OFF");
-        break;
-
-      case 'C':
         doorServo.write(90);
         Serial.println("DOOR OPEN");
         break;
 
-      case 'c':
+      case 'b':
         doorServo.write(0);
-        Serial.println("DOOR CLOSE");
-        break;
-
-      case 'D':
-        digitalWrite(securityPin, HIGH);
-        Serial.println("SECURITY ON");
-        break;
-
-      case 'd':
-        digitalWrite(securityPin, LOW);
-        Serial.println("SECURITY OFF");
+        Serial.println("DOOR CLOSED");
         break;
 
       default:
-        // ignore unknown commands safely
+        // Ignore unknown commands safely
         break;
     }
   }
