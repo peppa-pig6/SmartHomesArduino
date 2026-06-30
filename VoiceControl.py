@@ -10,14 +10,8 @@ import time
 # A = Turn Living Room Light ON
 # a = Turn Living Room Light OFF
 #
-# B = Turn Fan ON
-# b = Turn Fan OFF
-#
-# C = Open Door
-# c = Close Door
-#
-# D = Security System ON
-# d = Security System OFF
+# B = Open Door
+# b = Close Door
 #
 # ==========================================
 
@@ -83,26 +77,12 @@ def process_voice(recognized_text):
     elif "turn off light" in lowered or "light off" in lowered:
         send_signal("a")
 
-    # Fan
-    elif "turn on fan" in lowered or "fan on" in lowered:
-        send_signal("B")
-
-    elif "turn off fan" in lowered or "fan off" in lowered:
-        send_signal("b")
-
     # Door
     elif "open door" in lowered:
-        send_signal("C")
+        send_signal("B")
 
     elif "close door" in lowered:
-        send_signal("c")
-
-    # Security
-    elif "security on" in lowered:
-        send_signal("D")
-
-    elif "security off" in lowered:
-        send_signal("d")
+        send_signal("b")
 
     else:
         print("[INFO] Command not recognised.")
@@ -148,5 +128,5 @@ except KeyboardInterrupt:
     print("Program stopped.")
 
     # ==========================================
-    #Declaration: The overall project design, logic, and implementation were developed by me. As this was my first time working with Arduino and Python integration, I used AI to assist with understanding concepts, improving code structure, adding comments, and debugging.
-    #==========================================
+    # Declaration: The overall project design, logic, and implementation were developed by me. As this was my first time working with Arduino and Python integration, I used AI to assist with understanding concepts, improving code structure, adding comments, and debugging.
+    # ==========================================
