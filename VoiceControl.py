@@ -1,7 +1,6 @@
 import serial
 import speech_recognition as sr
 import numpy as np
-import time
 
 # ==========================================
 # SERIAL COMMAND KEYS SENT TO THE ARDUINO
@@ -10,8 +9,15 @@ import time
 # A = Turn Living Room Light ON
 # a = Turn Living Room Light OFF
 #
+# K = Turn Kitchen Light ON
+# k = Turn Kitchen Light OFF
+#
 # B = Open Door
 # b = Close Door
+#
+# G = Good Boy (Servo Wag)
+#
+# P = Party Mode
 #
 # ==========================================
 
@@ -21,8 +27,7 @@ import time
 
 # Windows: "COM3"
 # macOS: "/dev/tty.usbmodem1101" (change after connecting Arduino)
-SERIAL_PORT = "COM3"
-
+SERIAL_PORT = "/dev/cu.usbmodem12401"
 BAUD_RATE = 9600
 NOISE_THRESHOLD = 500
 
@@ -31,11 +36,6 @@ NOISE_THRESHOLD = 500
 # -------------------------------
 
 arduino = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-
-# IMPORTANT FIX: Arduino reset delay
-time.sleep(2)
-arduino.reset_input_buffer()
-
 print(f"[INFO] Connected to Arduino on {SERIAL_PORT}")
 
 recognizer = sr.Recognizer()
@@ -59,8 +59,7 @@ def get_rms_volume(audio_data):
 
 
 def send_signal(command):
-    arduino.write((command + "\n").encode())
-    arduino.flush()
+    arduino.write(command.encode())
     print(f"[SENT] {command}")
 
 
@@ -70,12 +69,19 @@ def process_voice(recognized_text):
 
     print(f"[HEARD] {lowered}")
 
-    # Light
-    if "turn on light" in lowered or "light on" in lowered:
+    # Living Room Light
+    if "turn on living room light" in lowered or "living room light on" in lowered:
         send_signal("A")
 
-    elif "turn off light" in lowered or "light off" in lowered:
+    elif "turn off living room light" in lowered or "living room light off" in lowered:
         send_signal("a")
+
+    # Kitchen Light
+    elif "turn on kitchen light" in lowered or "kitchen light on" in lowered:
+        send_signal("K")
+
+    elif "turn off kitchen light" in lowered or "kitchen light off" in lowered:
+        send_signal("k")
 
     # Door
     elif "open door" in lowered:
@@ -83,6 +89,13 @@ def process_voice(recognized_text):
 
     elif "close door" in lowered:
         send_signal("b")
+
+    # Fun Mode
+    elif "good boy" in lowered:
+        send_signal("G")
+
+    elif "party mode" in lowered:
+        send_signal("P")
 
     else:
         print("[INFO] Command not recognised.")
@@ -99,7 +112,7 @@ try:
     while True:
 
         with microphone as source:
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=3)
+            audio = recognizer.listen(source, phrase_time_limit=3)
 
         volume = get_rms_volume(audio)
 
