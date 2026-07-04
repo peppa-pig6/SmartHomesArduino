@@ -43,7 +43,7 @@ void setup() {
 }
 
 void loop() {
-
+  
   if (Serial.available()) {
 
     char cmd = Serial.read();
@@ -117,6 +117,18 @@ void loop() {
 
         Serial.println("PARTY MODE");
 
+        break;
+
+      case 'L':
+        digitalWrite(livingRoomLightPin, HIGH);
+        digitalWrite(kitchenLightPin, HIGH);
+        Serial.println("ALL LIGHTS ON");
+        break;
+
+      case 'l':
+        digitalWrite(livingRoomLightPin, LOW);
+        digitalWrite(kitchenLightPin, LOW);
+        Serial.println("ALL LIGHTS OFF");
         break;
 
       default:
