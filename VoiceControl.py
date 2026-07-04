@@ -26,8 +26,7 @@ import numpy as np
 # -------------------------------
 
 # Windows: "COM3"
-# macOS: "/dev/tty.usbmodem1101" (change after connecting Arduino)
-SERIAL_PORT = "/dev/cu.usbmodem12401"
+SERIAL_PORT = "/dev/cu.usbmodem112401"
 BAUD_RATE = 9600
 NOISE_THRESHOLD = 500
 
@@ -69,8 +68,15 @@ def process_voice(recognized_text):
 
     print(f"[HEARD] {lowered}")
 
+    # All Lights
+    if "all lights on" in lowered or "turn on all lights" in lowered:
+        send_signal("L")
+
+    elif "all lights off" in lowered or "turn off all lights" in lowered:
+        send_signal("l")
+
     # Living Room Light
-    if "turn on living room light" in lowered or "living room light on" in lowered:
+    elif "turn on living room light" in lowered or "living room light on" in lowered:
         send_signal("A")
 
     elif "turn off living room light" in lowered or "living room light off" in lowered:
