@@ -1,151 +1,96 @@
-import serial
 import speech_recognition as sr
-import numpy as np
+import serial
+import time
+import subprocess
 
-# ==========================================
-# SERIAL COMMAND KEYS SENT TO THE ARDUINO
-# ==========================================
-#
-# A = Turn Living Room Light ON
-# a = Turn Living Room Light OFF
-#
-# K = Turn Kitchen Light ON
-# k = Turn Kitchen Light OFF
-#
-# B = Open Door
-# b = Close Door
-#
-# G = Good Boy (Servo Wag)
-#
-# P = Party Mode
-#
-# ==========================================
+# ------------------------
+# SETTINGS
+# ------------------------
 
-# -------------------------------
-# CONFIGURATION
-# -------------------------------
+PORT = "/dev/cu.usbmodem112401"
+BAUD = 9600
 
-# Windows: "COM3"
-SERIAL_PORT = "/dev/cu.usbmodem112401"
-BAUD_RATE = 9600
-NOISE_THRESHOLD = 500
-
-# -------------------------------
-# SERIAL CONNECTION
-# -------------------------------
-
-arduino = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-print(f"[INFO] Connected to Arduino on {SERIAL_PORT}")
+arduino = serial.Serial(PORT, BAUD)
+time.sleep(2)
 
 recognizer = sr.Recognizer()
-microphone = sr.Microphone()
 
-print("[INFO] Calibrating microphone...")
-with microphone as source:
-    recognizer.adjust_for_ambient_noise(source, duration=2)
+# ------------------------
+# TEXT TO SPEECH
+# ------------------------
 
-print("[INFO] Ready! Speak a command.\n")
+def speak(text):
+    print("Jarvis:", text)
+    subprocess.run(["say", text])
 
+# ------------------------
+# SEND TO ARDUINO
+# ------------------------
 
-# -------------------------------
-# FUNCTIONS
-# -------------------------------
+def send(command):
+    arduino.write((command + "\n").encode())
 
-def get_rms_volume(audio_data):
-    samples = np.frombuffer(audio_data.get_raw_data(), dtype=np.int16)
-    rms = np.sqrt(np.mean(samples.astype(np.float64) ** 2))
-    return rms
+# ------------------------
+# EXECUTE COMMAND
+# ------------------------
 
+def execute(command):
 
-def send_signal(command):
-    arduino.write(command.encode())
-    print(f"[SENT] {command}")
+    command = command.lower()
 
+    if "green" in command:
+        send("green")
+        speak("Green light activated.")
 
-def process_voice(recognized_text):
+    elif "yellow" in command:
+        send("yellow")
+        speak("Yellow light activated.")
 
-    lowered = recognized_text.lower()
-
-    print(f"[HEARD] {lowered}")
-
-    # All Lights
-    if "all lights on" in lowered or "turn on all lights" in lowered:
-        send_signal("L")
-
-    elif "all lights off" in lowered or "turn off all lights" in lowered:
-        send_signal("l")
-
-    # Living Room Light
-    elif "turn on living room light" in lowered or "living room light on" in lowered:
-        send_signal("A")
-
-    elif "turn off living room light" in lowered or "living room light off" in lowered:
-        send_signal("a")
-
-    # Kitchen Light
-    elif "turn on kitchen light" in lowered or "kitchen light on" in lowered:
-        send_signal("K")
-
-    elif "turn off kitchen light" in lowered or "kitchen light off" in lowered:
-        send_signal("k")
-
-    # Door
-    elif "open door" in lowered:
-        send_signal("B")
-
-    elif "close door" in lowered:
-        send_signal("b")
-
-    # Fun Mode
-    elif "good boy" in lowered:
-        send_signal("G")
-
-    elif "party mode" in lowered:
-        send_signal("P")
+    elif "red" in command:
+        send("red")
+        speak("Red light activated.")
 
     else:
-        print("[INFO] Command not recognised.")
+        speak("I don't understand that command.")
 
-
-# -------------------------------
+# ------------------------
 # MAIN LOOP
-# -------------------------------
+# ------------------------
 
-print("Listening...")
+speak("Jarvis online.")
 
-try:
+while True:
 
-    while True:
+    with sr.Microphone() as source:
 
-        with microphone as source:
-            audio = recognizer.listen(source, phrase_time_limit=3)
+        recognizer.adjust_for_ambient_noise(source, duration=0.5)
 
-        volume = get_rms_volume(audio)
+        print("Listening for callsign...")
 
-        print(f"Volume = {volume:.1f}")
-
-        if volume < NOISE_THRESHOLD:
-            print("Too quiet.")
-            continue
+        audio = recognizer.listen(source)
 
         try:
 
-            text = recognizer.recognize_google(audio)
+            text = recognizer.recognize_google(audio).lower()
 
-            process_voice(text)
+            print("You:", text)
+
+            if "jarvis" in text:
+
+                speak("Yes sir.")
+
+                print("Listening for command...")
+
+                audio = recognizer.listen(source)
+
+                command = recognizer.recognize_google(audio)
+
+                print("Command:", command)
+
+                execute(command)
 
         except sr.UnknownValueError:
-            print("Could not understand.")
+            pass
 
-        except sr.RequestError as e:
+        except Exception as e:
             print(e)
-
-except KeyboardInterrupt:
-
-    arduino.close()
-
-    print("Program stopped.")
-
-    # ==========================================
-    # Declaration: The overall project design, logic, and implementation were developed by me. As this was my first time working with Arduino and Python integration, I used AI to assist with understanding concepts, improving code structure, adding comments, and debugging.
-    # ==========================================
