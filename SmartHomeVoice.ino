@@ -16,6 +16,12 @@ void allOff() {
   digitalWrite(green, LOW);
 }
 
+void allOn() {
+  digitalWrite(red, HIGH);
+  digitalWrite(yellow, HIGH);
+  digitalWrite(green, HIGH);
+}
+
 void loop() {
 
   if (Serial.available()) {
@@ -26,16 +32,22 @@ void loop() {
     Serial.print("Received: ");
     Serial.println(cmd);
 
-    allOff();
-
-    if (cmd == "red") {
+    if (cmd == "red on") {
       digitalWrite(red, HIGH);
-    }
-    else if (cmd == "yellow") {
+    } else if (cmd == "red off") {
+      digitalWrite(red, LOW);
+    } else if (cmd == "yellow on") {
       digitalWrite(yellow, HIGH);
-    }
-    else if (cmd == "green") {
+    } else if (cmd == "yellow off") {
+      digitalWrite(yellow, LOW);
+    } else if (cmd == "green on") {
       digitalWrite(green, HIGH);
+    } else if (cmd == "green off") {
+      digitalWrite(green, LOW);
+    } else if (cmd == "all on") {
+      allOn();
+    } else if (cmd == "all off") {
+      allOff();
     }
   }
 }
