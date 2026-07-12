@@ -7,13 +7,20 @@ import subprocess
 # SETTINGS
 # ------------------------
 
-PORT = "/dev/cu.usbmodem112401"
+PORT = "/dev/cu.usbmodem12401"
 BAUD = 9600
 
 arduino = serial.Serial(PORT, BAUD)
 time.sleep(2)
 
 recognizer = sr.Recognizer()
+
+# Better microphone sensitivity
+recognizer.dynamic_energy_threshold = True
+recognizer.energy_threshold = 250
+recognizer.pause_threshold = 0.8
+recognizer.phrase_threshold = 0.3
+recognizer.non_speaking_duration = 0.4
 
 # ------------------------
 # TEXT TO SPEECH
@@ -38,38 +45,109 @@ def execute(command):
 
     command = command.lower()
 
-    if "green" in command:
-        send("green")
-        speak("Green light activated.")
+    # ------------------------
+    # ALL LIGHTS
+    # ------------------------
+
+    if "all" in command:
+
+        if "off" in command:
+            send("all off")
+            speak("Turning all lights off.")
+
+        else:
+            send("all on")
+            speak("Turning all lights on.")
+
+    # ------------------------
+    # GREEN
+    # ------------------------
+
+    elif "green" in command:
+
+        if "off" in command:
+            send("green off")
+            speak("Turning the green light off.")
+
+        else:
+            send("green on")
+            speak("Turning the green light on.")
+
+    # ------------------------
+    # YELLOW
+    # ------------------------
 
     elif "yellow" in command:
-        send("yellow")
-        speak("Yellow light activated.")
+
+        if "off" in command:
+            send("yellow off")
+            speak("Turning the yellow light off.")
+
+        else:
+            send("yellow on")
+            speak("Turning the yellow light on.")
+
+    # ------------------------
+    # RED
+    # ------------------------
 
     elif "red" in command:
-        send("red")
-        speak("Red light activated.")
+
+        if "off" in command:
+            send("red off")
+            speak("Turning the red light off.")
+
+        else:
+            send("red on")
+            speak("Turning the red light on.")
+
+    # ------------------------
+    # HIT IT / SING
+    # ------------------------
+
+    elif "hit it" in command or "sing" in command:
+
+        speak("Hit it.")
+
+        speak("""
+        Billie Jean is not my lover She's just a girl who claims that I am the one.
+         But the kid is not my son 
+         She says I am the one
+          But the kid is not my son
+        """)
+
+    # ------------------------
+    # UNKNOWN COMMAND
+    # ------------------------
 
     else:
         speak("I don't understand that command.")
 
 # ------------------------
-# MAIN LOOP
+# STARTUP
 # ------------------------
 
 speak("Jarvis online.")
+
+# ------------------------
+# MAIN LOOP
+# ------------------------
 
 while True:
 
     with sr.Microphone() as source:
 
-        recognizer.adjust_for_ambient_noise(source, duration=0.5)
+        recognizer.adjust_for_ambient_noise(source, duration=1.5)
 
         print("Listening for callsign...")
 
-        audio = recognizer.listen(source)
-
         try:
+
+            audio = recognizer.listen(
+                source,
+                timeout=5,
+                phrase_time_limit=5
+            )
 
             text = recognizer.recognize_google(audio).lower()
 
@@ -81,13 +159,20 @@ while True:
 
                 print("Listening for command...")
 
-                audio = recognizer.listen(source)
+                audio = recognizer.listen(
+                    source,
+                    timeout=5,
+                    phrase_time_limit=5
+                )
 
                 command = recognizer.recognize_google(audio)
 
                 print("Command:", command)
 
                 execute(command)
+
+        except sr.WaitTimeoutError:
+            continue
 
         except sr.UnknownValueError:
             pass
