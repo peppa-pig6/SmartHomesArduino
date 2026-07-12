@@ -1,10 +1,10 @@
 const int red = 8;
-const int yellow = 9;
+const int blue = 9;
 const int green = 10;
 
 void setup() {
   pinMode(red, OUTPUT);
-  pinMode(yellow, OUTPUT);
+  pinMode(blue, OUTPUT);
   pinMode(green, OUTPUT);
 
   Serial.begin(9600);
@@ -12,13 +12,13 @@ void setup() {
 
 void allOff() {
   digitalWrite(red, LOW);
-  digitalWrite(yellow, LOW);
+  digitalWrite(blue, LOW);
   digitalWrite(green, LOW);
 }
 
 void allOn() {
   digitalWrite(red, HIGH);
-  digitalWrite(yellow, HIGH);
+  digitalWrite(blue, HIGH);
   digitalWrite(green, HIGH);
 }
 
@@ -34,20 +34,29 @@ void loop() {
 
     if (cmd == "red on") {
       digitalWrite(red, HIGH);
-    } else if (cmd == "red off") {
+    }
+    else if (cmd == "red off") {
       digitalWrite(red, LOW);
-    } else if (cmd == "yellow on") {
-      digitalWrite(yellow, HIGH);
-    } else if (cmd == "yellow off") {
-      digitalWrite(yellow, LOW);
-    } else if (cmd == "green on") {
+    }
+    else if (cmd == "blue on") {
+      digitalWrite(blue, HIGH);
+    }
+    else if (cmd == "blue off") {
+      digitalWrite(blue, LOW);
+    }
+    else if (cmd == "green on") {
       digitalWrite(green, HIGH);
-    } else if (cmd == "green off") {
+    }
+    else if (cmd == "green off") {
       digitalWrite(green, LOW);
-    } else if (cmd == "all on") {
+    }
+    else if (cmd == "all on") {
       allOn();
-    } else if (cmd == "all off") {
+    }
+    else if (cmd == "all off") {
       allOff();
     }
+
   }
+
 }
