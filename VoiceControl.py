@@ -112,10 +112,6 @@ def execute(command):
         elif "on" in command:
             send("green on")
             speak("Turning the green light on.")
-
-        else:
-            speak("Do you want the green light on or off?")
-
     # ------------------------
     # HIT IT / SING
     # ------------------------
@@ -137,7 +133,9 @@ def execute(command):
 # STARTUP
 # ------------------------
 
-speak("Jarvis online.")
+speak("Initiating server connection...")
+time.sleep(2)
+speak("Jarvis Online")
 
 # ------------------------
 # MAIN LOOP
