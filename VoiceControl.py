@@ -35,6 +35,7 @@ def speak(text):
 # ------------------------
 
 def send(command):
+    print("Sending:", command)
     arduino.write((command + "\n").encode())
 
 # ------------------------
@@ -44,6 +45,8 @@ def send(command):
 def execute(command):
 
     command = command.lower()
+
+    print("Recognized:", command)
 
     # ------------------------
     # ALL LIGHTS
@@ -55,37 +58,12 @@ def execute(command):
             send("all off")
             speak("Turning all lights off.")
 
-        else:
+        elif "on" in command:
             send("all on")
             speak("Turning all lights on.")
 
-    # ------------------------
-    # GREEN
-    # ------------------------
-
-    elif "green" in command:
-
-        if "off" in command:
-            send("green off")
-            speak("Turning the green light off.")
-
         else:
-            send("green on")
-            speak("Turning the green light on.")
-
-    # ------------------------
-    # YELLOW
-    # ------------------------
-
-    elif "yellow" in command:
-
-        if "off" in command:
-            send("yellow off")
-            speak("Turning the yellow light off.")
-
-        else:
-            send("yellow on")
-            speak("Turning the yellow light on.")
+            speak("Do you want all lights on or off?")
 
     # ------------------------
     # RED
@@ -97,9 +75,46 @@ def execute(command):
             send("red off")
             speak("Turning the red light off.")
 
-        else:
+        elif "on" in command:
             send("red on")
             speak("Turning the red light on.")
+
+        else:
+            speak("Do you want the red light on or off?")
+
+    # ------------------------
+    # BLUE
+    # ------------------------
+
+    elif "blue" in command:
+
+        if "off" in command:
+            send("blue off")
+            speak("Turning the blue light off.")
+
+        elif "on" in command:
+            send("blue on")
+            speak("Turning the blue light on.")
+
+        else:
+            speak("Do you want the blue light on or off?")
+
+    # ------------------------
+    # GREEN
+    # ------------------------
+
+    elif "green" in command:
+
+        if "off" in command:
+            send("green off")
+            speak("Turning the green light off.")
+
+        elif "on" in command:
+            send("green on")
+            speak("Turning the green light on.")
+
+        else:
+            speak("Do you want the green light on or off?")
 
     # ------------------------
     # HIT IT / SING
@@ -109,12 +124,7 @@ def execute(command):
 
         speak("Hit it.")
 
-        speak("""
-        Billie Jean is not my lover She's just a girl who claims that I am the one.
-         But the kid is not my son 
-         She says I am the one
-          But the kid is not my son
-        """)
+        # Song code goes here
 
     # ------------------------
     # UNKNOWN COMMAND
@@ -137,9 +147,9 @@ while True:
 
     with sr.Microphone() as source:
 
-        recognizer.adjust_for_ambient_noise(source, duration=1.5)
+        recognizer.adjust_for_ambient_noise(source, duration=1)
 
-        print("Listening for callsign...")
+        print("Waiting for callsign...")
 
         try:
 
@@ -165,7 +175,7 @@ while True:
                     phrase_time_limit=5
                 )
 
-                command = recognizer.recognize_google(audio)
+                command = recognizer.recognize_google(audio).lower()
 
                 print("Command:", command)
 
