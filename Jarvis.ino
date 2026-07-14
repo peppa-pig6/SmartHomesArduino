@@ -23,11 +23,10 @@ void allOn() {
 }
 
 void loop() {
-
   if (Serial.available()) {
-
     String cmd = Serial.readStringUntil('\n');
     cmd.trim();
+    cmd.toLowerCase(); // Clean input to prevent case mismatches
 
     Serial.print("Received: ");
     Serial.println(cmd);
@@ -56,7 +55,5 @@ void loop() {
     else if (cmd == "all off") {
       allOff();
     }
-
   }
-
 }
